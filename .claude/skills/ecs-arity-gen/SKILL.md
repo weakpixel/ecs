@@ -48,7 +48,7 @@ Then for example `NewEntity3` resolves the 3 IDs into a `[3]ComponentID`, finds 
 | `NewEntityN` | 0 allocs/op in steady state. Registers its types on first use (generic API, D3). Duplicate types panic `ecs: duplicate component`. |
 | `NewViewN` / `ViewN` | Registers and resolves the IDs in the constructor; panics `ecs: duplicate component` on a repeated type. Holds a pointer to shared state (world, IDs, lazily resolved spawn archetype and typed columns, lazily built query cache). |
 | `ViewN.NewEntity` | Claims an entity in the pre-resolved archetype and appends; must be several times faster than `NewEntityN` (the perf guide targets ≈3–4× for N=7). 0 allocs/op. |
-| `ViewN.Get` / `Has` | Validate the entity and find its archetype **once** for all N components. `Get` panics `ecs: entity does not have component: <T>` on the first missing one. `View1.Get` returns `*T1`. |
+| `ViewN.Get` / `Has` | Validate the entity and find its archetype **once** for all N components. `Get` panics `ecs: entity does not have component: <T>` on the first missing one. `View1.Get` returns `*T1`. `View1.GetOrNil` returns nil instead of panicking (no `GetOrNil` for N ≥ 2: a `ComponentsN` can't be nil). |
 | `ViewN.Set` | Add or replace all N. In place (no revision bump) when the entity has all N; otherwise exactly one move to the union archetype. 0 allocs/op in both cases. |
 | `ViewN.Remove` | Removes the components the entity has, in one move; no-op (no revision bump) if it has none. |
 | `ViewN.Each` | Wraps the untyped query state (shared archetype cache, revision check) but iterates with typed column slices, not `[]any`. `View1.Each` yields `*T1`, N≥2 yields `ComponentsN` by value. 0 allocs/op per loop. |

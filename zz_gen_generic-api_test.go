@@ -37,6 +37,10 @@ func TestZZGenArity1(t *testing.T) {
 		t.Fatalf("view.Get after Set = %+v, want V=2", got)
 	}
 
+	if got := view.GetOrNil(e); got == nil || got.V != 2 {
+		t.Fatalf("view.GetOrNil = %+v, want V=2", got)
+	}
+
 	view.Remove(e)
 	if view.Has(e) {
 		t.Fatalf("view.Has = true after Remove")
@@ -71,6 +75,12 @@ func TestZZGenArity1(t *testing.T) {
 	}
 	if filtered.Has(excluded) {
 		t.Fatalf("filtered.Has = true for the excluded entity")
+	}
+	if filtered.GetOrNil(excluded) == nil {
+		t.Fatalf("filtered.GetOrNil = nil for the excluded entity, want the filters ignored")
+	}
+	if view.GetOrNil(w.NewEntity()) != nil {
+		t.Fatalf("view.GetOrNil = non-nil for an entity without genComp1")
 	}
 }
 

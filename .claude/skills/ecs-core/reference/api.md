@@ -68,6 +68,7 @@ func NewViewN[T1, ..., TN any](w *World, filters ...Filter) ViewN[T1, ..., TN]  
 type ViewN[T1, ..., TN any] struct{ /* pointer to shared state; zero value panics */ }
 func (v ViewN[...]) NewEntity(v1 T1, ..., vN TN) Entity     // pre-resolved archetype
 func (v ViewN[...]) Get(e Entity) ComponentsN[...]          // View1: *T1; panics if any missing
+func (v View1[T1]) GetOrNil(e Entity) *T1                   // View1 only; nil if missing, ignores filters
 func (v ViewN[...]) Has(e Entity) bool                      // all N present
 func (v ViewN[...]) Set(e Entity, v1 T1, ..., vN TN)        // add or replace; in place or one move
 func (v ViewN[...]) Remove(e Entity)                        // removes present ones; one move

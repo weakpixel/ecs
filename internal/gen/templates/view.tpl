@@ -86,6 +86,29 @@ func (v View{{.N}}[{{.TypeParams}}]) Get(e Entity) Components{{.N}}[{{.TypeParam
 }
 {{end}}
 
+{{if eq .N 1}}
+// GetOrNil is Get but returns nil instead of panicking when e doesn't
+// currently have T1. Like Get it ignores the view's filters, and it still
+// panics on a stale e. In a hot loop it replaces [GetCompOrNil], which
+// resolves the component type on every call; the view resolved it once.
+//
+// Panics with "ecs: invalid or stale entity: <e>" if e is stale.
+//
+// Cost: 0 allocations.
+func (v View1[T1]) GetOrNil(e Entity) *T1 {
+	st := v.state
+	if st == nil {
+		panicNotBound()
+	}
+	rec := st.world.record(e)
+	c1 := columnOf[T1](rec.Arch, st.ids[0])
+	if c1 == nil {
+		return nil
+	}
+	return c1.Ptr(int(rec.Row))
+}
+{{end}}
+
 // Has reports whether e currently has all {{.N}} components and none that
 // the view's filters exclude, which is whether Each would yield it.
 //

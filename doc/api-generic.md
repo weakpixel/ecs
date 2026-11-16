@@ -79,12 +79,13 @@ movement.Remove(e) // removes Position and Velocity, at most one move
 | --- | --- |
 | `NewEntity(v1, v2, ...) Entity` | Creates an entity with exactly the view's components. The fastest way to create many entities of one shape. |
 | `Get(e)` | Pointers in type-parameter order as a `ComponentsN` (`View1` returns `*T1`). Panics if `e` is stale or lacks any component. |
+| `GetOrNil(e) *T1` | `View1` only: `Get`, but `nil` when `e` lacks `T1`. Like `Get` it ignores [filters](#filters). Panics if `e` is stale. In a hot loop it replaces `GetCompOrNil[T1]`, which resolves the component type on every call. |
 | `Has(e) bool` | `true` only when `e` has all components and none that a [filter](#filters) excludes, so exactly when `Each` would yield `e`. Panics if `e` is stale. |
 | `Set(e, v1, v2, ...)` | Adds or replaces all components. In place when `e` already has all of them, otherwise one archetype move. |
 | `Remove(e)` | Removes the view's components that `e` has, in one archetype move. |
 | `Each() iter.Seq2[Entity, ComponentsN]` | Yields every entity that has all components (`View1` yields `*T1`). Entities with additional components also match, unless a [filter](#filters) excludes one of them. |
 
-There is no `GetOrNil` on views, because a `ComponentsN` result can't be nil. Use `Has` first:
+Views of two or more components have no `GetOrNil`, because a `ComponentsN` result can't be nil. Use `Has` first:
 
 ```go
 if movement.Has(target) {
