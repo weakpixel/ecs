@@ -268,6 +268,20 @@ func TestAllocsView3Get(t *testing.T) {
 	}
 }
 
+func TestAllocsView1GetOrNil(t *testing.T) {
+	w := ecs.NewWorld()
+	v := ecs.NewView1[genComp1](w)
+	with := v.NewEntity(genComp1{V: 1})
+	without := ecs.NewEntity1(w, genComp2{V: 1})
+
+	if n := testing.AllocsPerRun(100, func() {
+		v.GetOrNil(with)
+		v.GetOrNil(without)
+	}); n != 0 {
+		t.Fatalf("View1.GetOrNil allocs = %v, want 0", n)
+	}
+}
+
 func TestAllocsView3Has(t *testing.T) {
 	w := ecs.NewWorld()
 	v := ecs.NewView3[genComp1, genComp2, genComp3](w)

@@ -46,7 +46,7 @@ Get `raceEnabled` from a pair of files with `//go:build race` and `//go:build !r
 
 ## Benchmark file layout (`benchmark_test.go`)
 
-The module has no benchmarks yet. When adding them, put them in `benchmark_test.go` at the root and include at least:
+So far `benchmark_test.go` at the root holds only `BenchmarkLookup` (one-component lookups by entity: `GetCompOrNil[T]`, `HasComp[T]` and the `View1` methods). Add the others there, at least:
 - `BenchmarkNewEntity7` and `BenchmarkViewNewEntity` (a `View7`)
 - `BenchmarkGetComp` (N separate `GetComp[T]` calls) and `BenchmarkViewGet` with the same N
 - `BenchmarkView2Each` (typed) and `BenchmarkWorldQueryEach` (untyped `[]any`), with 1k and 10k entities across several archetypes

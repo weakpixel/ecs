@@ -20,6 +20,7 @@ func TestZeroView1Panics(t *testing.T) {
 
 	mustPanic(t, "ecs: not bound to a world", func() { v.NewEntity(genComp1{}) })
 	mustPanic(t, "ecs: not bound to a world", func() { v.Get(e) })
+	mustPanic(t, "ecs: not bound to a world", func() { v.GetOrNil(e) })
 	mustPanic(t, "ecs: not bound to a world", func() { v.Has(e) })
 	mustPanic(t, "ecs: not bound to a world", func() { v.Set(e, genComp1{}) })
 	mustPanic(t, "ecs: not bound to a world", func() { v.Remove(e) })
@@ -52,6 +53,31 @@ func TestView1GetPanicsOnStaleEntity(t *testing.T) {
 	e := v.NewEntity(genComp1{})
 	w.DeleteEntity(e)
 	mustPanic(t, "ecs: invalid or stale entity", func() { v.Get(e) })
+}
+
+func TestView1GetOrNil(t *testing.T) {
+	w := ecs.NewWorld()
+	v := ecs.NewView1[genComp1](w)
+	with := v.NewEntity(genComp1{V: 7})
+	without := ecs.NewEntity1(w, genComp2{V: 1})
+
+	if got := v.GetOrNil(with); got == nil || got.V != 7 {
+		t.Fatalf("GetOrNil(with) = %+v, want V=7", got)
+	}
+	if got := v.GetOrNil(with); got != v.Get(with) {
+		t.Fatalf("GetOrNil(with) = %p, want the pointer Get returns (%p)", got, v.Get(with))
+	}
+	if got := v.GetOrNil(without); got != nil {
+		t.Fatalf("GetOrNil(without) = %+v, want nil", got)
+	}
+}
+
+func TestView1GetOrNilPanicsOnStaleEntity(t *testing.T) {
+	w := ecs.NewWorld()
+	v := ecs.NewView1[genComp1](w)
+	e := v.NewEntity(genComp1{})
+	w.DeleteEntity(e)
+	mustPanic(t, "ecs: invalid or stale entity", func() { v.GetOrNil(e) })
 }
 
 func TestView1Has(t *testing.T) {
